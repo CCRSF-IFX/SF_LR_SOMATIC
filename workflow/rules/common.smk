@@ -6,14 +6,44 @@ import pandas as pd
 configfile: "config/config.yaml"
 validate(config, schema="../schemas/config.schema.yaml")
 
-def load_samples(samplesheet):
-    samples = {}
-    with open(samplesheet, 'r') as f:
-        for line in f:
-            sample, path = line.strip().split(',')
-            samples[sample] = {'path': path}
-    return samples
-
-samples = load_samples(config["sample_sheet"])
-
 analysis = config.analysispath
+
+# Path to the sample sheet
+SAMPLE_SHEET = "config/sample_sheet.csv"
+
+# Read the sample sheet into a DataFrame
+sample_sheet = pd.read_csv(SAMPLE_SHEET)
+
+# Ensure that the sample sheet has the correct columns
+assert 'Tumor Sample ID' in sample_sheet.columns, "Sample sheet missing 'Tumor Sample ID'"
+assert 'Tumor Sample Path' in sample_sheet.columns, "Sample sheet missing 'Tumor Sample Path'"
+assert 'Normal Sample ID' in sample_sheet.columns, "Sample sheet missing 'Normal Sample ID'"
+assert 'Normal Sample Path' in sample_sheet.columns, "Sample sheet missing 'Normal Sample Path'"
+
+# Creating dictionaries for sample paths to be accessed by sample IDs
+tumor_sample_paths = dict(zip(sample_sheet['Tumor Sample ID'], sample_sheet['Tumor Sample Path']))
+normal_sample_paths = dict(zip(sample_sheet['Normal Sample ID'], sample_sheet['Normal Sample Path']))
+
+# Combine tumor and normal samples into a single dictionary for easier handling
+samples = {
+    'tumor': tumor_sample_paths,
+    'normal': normal_sample_paths,
+}
+
+# Function to get the sample path based on sample type and ID
+def get_sample_path(sample_type, sample_id):
+    return samples[sample_type][sample_id]
+
+
+# Setting up wildcards
+#TUMOR_SAMPLES = list(sample_sheet['Tumor Sample ID'])
+#NORMAL_SAMPLES = list(sample_sheet['Normal Sample ID'])
+
+# Function to get tumor sample path by ID
+#def get_tumor_path(sample_id):
+#    return tumor_sample_paths[sample_id]
+
+# Function to get normal sample path by ID
+#def get_normal_path(sample_id):
+#    return normal_sample_paths[sample_id]
+

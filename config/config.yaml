@@ -1,4 +1,4 @@
-sample_sheet: "samplesheet.csv"
+sample_sheet: "samples_sheet.csv"
 reference: "hg38"
 ONT: True
 
