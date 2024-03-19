@@ -1,0 +1,5 @@
+Tumor Sample ID,Tumor Sample Path,Normal Sample ID,Normal Sample Path
+Tumor_01,/path/to/tumor/sample_01.fastq.gz,Normal_01,/path/to/normal/sample_01.fastq.gz
+Tumor_02,/path/to/tumor/sample_02.fastq.gz,Normal_02,/path/to/normal/sample_02.fastq.gz
+Tumor_03,/path/to/tumor/sample_03.fastq.gz,Normal_03,/path/to/normal/sample_03.fastq.gz
+
