@@ -1,14 +1,39 @@
-rule deepvariant_normal:
+rule deepvariant_tumor:
     input:
-        ref="path/to/ref.fa",
-        normal_bam="sorted/normal_{sample_id}/{sample_id}.sorted.bam"
+        tumor_bam="sorted/tumor_{sample_id}/{sample_id}.sorted.bam"
     output:
-        vcf="vcfs/normal_{sample_id}/normal_{sample_id}.vcf"
+        vcf="vcfs/tumor_{sample_id}/tumor_{sample_id}.vcf.gz"
     threads: 36
     resources:
         mem_mb=config['mem_lg'], 
         time=config['time'], 
         partition=config['partition']
+    params:
+        ref=config[config['reference']]['ref']
+    conda:
+        "envs/deepvariant.yaml"
+    shell:
+        """
+        run_deepvariant \
+          --model_type=ONT \
+          --ref={params.ref} \
+          --reads={input.tumor_bam} \
+          --output_vcf={output.vcf} \
+          --num_shards=36
+        """
+
+rule deepvariant_normal:
+    input:
+        normal_bam="sorted/normal_{sample_id}/{sample_id}.sorted.bam"
+    output:
+        vcf="vcfs/normal_{sample_id}/normal_{sample_id}.vcf.gz"
+    threads: 36
+    resources:
+        mem_mb=config['mem_lg'], 
+        time=config['time'], 
+        partition=config['partition']
+    params:
+        ref=config[config['reference']]['ref']
     conda:
         "envs/deepvariant.yaml"
     shell:
@@ -25,9 +50,9 @@ rule margin_phase_normal:
     input:
         normal_bam="sorted/normal_{sample_id}/{sample_id}.sorted.bam",
         ref="path/to/ref.fa",
-        vcf="vcfs/normal_{sample_id}/normal_{sample_id}.vcf"
+        vcf="vcfs/normal_{sample_id}/normal_{sample_id}.vcf.gz"
     output:
-        phased_vcf="phased/normal_{sample_id}/phased_normal_{sample_id}.vcf",
+        phased_vcf="phased/normal_{sample_id}/phased_normal_{sample_id}.vcf.gz",
         phased_bam="phased/normal_{sample_id}/phased_normal_{sample_id}.bam"
     threads: 36
     resources:

@@ -1,18 +1,19 @@
-# The main entry point of your workflow.
-# After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
+#Snakefile for nanopore somatic variant pipeline
+#CCR-SF IFX
 
-
-report: "report/workflow.rst"
-
-# Allow users to fix the underlying OS via singularity.
-singularity: "docker://continuumio/miniconda3"
-
+include: "rules/common.smk"
 
 rule all:
     input:
-        # The first rule should define the default target files
-        # Subsequent target rules can be specified below. They should start with all_*.
+        expand("qualimap/{sample_type}_{sample_id}/qualimapReport.html", sample_type=SAMPLE_TYPES, sample=SAMPLES), "VariantQC/clairs_variantqc.html",
+        expand("nanoplot_bam/{sample_type}_{sample_id}/{sample_id}Non_weightedHistogramReadlength.png", sample_type=SAMPLE_TYPES, sample=SAMPLES), 
+        expand("severus/tumor_{sample_id}/tumor_{sample_id}_severus_sv.vcf", sample=SAMPLES),               
+        expand("somatic_cna_plot/tumor_{sample_id}", sample=SAMPLES)
 
-
-include: "rules/common.smk"
-include: "rules/other.smk"
+include: "rules/map.smk"
+include: "rules/bam_qc.smk"
+include: "rules/clairs.smk"
+include: "rules/variant_qc.smk"
+include: "rules/vep.smk"
+include: "rules/severus.smk"
+include: "rules/somaticCNA.smk"

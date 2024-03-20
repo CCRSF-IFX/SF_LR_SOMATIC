@@ -6,8 +6,6 @@ import pandas as pd
 configfile: "config/config.yaml"
 validate(config, schema="../schemas/config.schema.yaml")
 
-analysis = config.analysispath
-
 # Path to the sample sheet
 SAMPLE_SHEET = "config/sample_sheet.csv"
 
@@ -24,11 +22,17 @@ assert 'Normal Sample Path' in sample_sheet.columns, "Sample sheet missing 'Norm
 tumor_sample_paths = dict(zip(sample_sheet['Tumor Sample ID'], sample_sheet['Tumor Sample Path']))
 normal_sample_paths = dict(zip(sample_sheet['Normal Sample ID'], sample_sheet['Normal Sample Path']))
 
+# Sample types (tumor and normal)
+SAMPLE_TYPES = ['tumor', 'normal']
+
 # Combine tumor and normal samples into a single dictionary for easier handling
 samples = {
     'tumor': tumor_sample_paths,
     'normal': normal_sample_paths,
 }
+
+# List of all sample IDs, assuming unique IDs across tumor and normal
+SAMPLES = list(set(sample_sheet['Tumor Sample ID']).union(set(sample_sheet['Normal Sample ID'])))
 
 # Function to get the sample path based on sample type and ID
 def get_sample_path(sample_type, sample_id):
