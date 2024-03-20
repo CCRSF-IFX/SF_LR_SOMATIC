@@ -10,7 +10,7 @@ The pipeline integrates several bioinformatics tools to process samples from raw
 
 ### Workflow Details
 
-The pipeline is designed to take raw sequencing data through a comprehensive analysis to identify and characterize somatic mutations, including single nucleotide variants (SNVs), structural variants (SVs), and copy number alterations (CNAs). Below is a breakdown of the critical stages in the pipeline:
+The pipeline is designed to take longread sequencing data through a comprehensive analysis to identify and characterize somatic mutations, including single nucleotide variants (SNVs), structural variants (SVs), and copy number alterations (CNAs). Below is a breakdown of the critical stages in the pipeline:
 
 #### Mapping with Minimap2
 - **Purpose**: Aligns raw sequencing reads to a reference genome. This step is crucial for identifying the genomic locations of the reads.
@@ -18,7 +18,7 @@ The pipeline is designed to take raw sequencing data through a comprehensive ana
 
 #### Sorting BAM Files
 - **Purpose**: Sorts the aligned reads in the BAM files by their genomic coordinates. Sorting is necessary for many downstream analyses, including variant calling.
-- **Tool**: Typically, this step is performed using tools like Samtools, which can efficiently sort and index BAM files.
+- **Tool**: This step is performed using Samtools, which can efficiently sort and index BAM files.
 
 #### Quality Control with Qualimap and NanoPlot
 - **Purpose**: Assesses the quality of the sequencing and alignment. Quality control metrics help identify potential issues with sequencing runs or alignment processes.
