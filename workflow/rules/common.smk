@@ -33,17 +33,3 @@ samples = {
 # Function to get the sample path based on sample type and ID
 def get_sample_path(sample_type, sample_id):
     return samples[sample_type][sample_id]
-
-
-# Setting up wildcards
-#TUMOR_SAMPLES = list(sample_sheet['Tumor Sample ID'])
-#NORMAL_SAMPLES = list(sample_sheet['Normal Sample ID'])
-
-# Function to get tumor sample path by ID
-#def get_tumor_path(sample_id):
-#    return tumor_sample_paths[sample_id]
-
-# Function to get normal sample path by ID
-#def get_normal_path(sample_id):
-#    return normal_sample_paths[sample_id]
-

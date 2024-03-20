@@ -6,10 +6,13 @@ if config['reference'] = "hg38":
     vep_fasta = "/mnt/Variant_annotation/VEP/homo_sapiens/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz"
 
 rule vep:
-    input: clair3 = "Sample_{sample}/clair3/{sample}_clair3_filtered.vcf.gz", sniffles = "Sample_{sample}/{sample}_sniffles_filtered.vcf.gz"
-    output: c3 = "Sample_{sample}/{sample}_clair3_filtered.vep.vcf", snf = "Sample_{sample}/{sample}_sniffles_filtered.vep.vcf"
-    resources: mem_mb=128000, time="96:00:00", partition="norm"
+    input: clairs = "clairs/tumor_{sample_id}/{sample_id}_clairs.vcf"
+    output: cs = "clairs/tumor_{sample_id}/{sample_id}_clairs.vep.vcf"
+    resources:
+        mem_mb=config['mem_lg'], 
+        time=config['time'], 
+        partition=config['partition']
     threads: 8
-    log: "Sample_{sample}/{sample}_vep.log"
+    log: "logs/tumor_{sample_id}_clairs_vep.log"
     conda: "envs/vep.yaml"
-    shell: "vep {vep_params} --species {vep_species} --assembly {vep_assembly} --fasta {vep_fasta} --vcf -i {input.clair3} -o {output.c3}; vep {vep_params} --species {vep_species} --assembly {vep_assembly} --fasta {vep_fasta} --vcf -i {input.sniffles} -o {output.snf}"
+    shell: "vep {vep_params} --species {vep_species} --assembly {vep_assembly} --fasta {vep_fasta} --vcf -i {input.clairs} -o {output.cs}"

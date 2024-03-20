@@ -1,0 +1,7 @@
+name: severus
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - severus=0.1.2

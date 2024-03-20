@@ -4,17 +4,21 @@ rule deepvariant_normal:
         normal_bam="sorted/normal_{sample_id}/{sample_id}.sorted.bam"
     output:
         vcf="vcfs/normal_{sample_id}/normal_{sample_id}.vcf"
+    threads: 36
+    resources:
+        mem_mb=config['mem_lg'], 
+        time=config['time'], 
+        partition=config['partition']
     conda:
         "envs/deepvariant.yaml"
     shell:
         """
-        singularity run --nv -B /usr/lib/locale/:/usr/lib/locale/ docker://google/deepvariant:latest \
         run_deepvariant \
           --model_type=ONT \
           --ref={input.ref} \
           --reads={input.normal_bam} \
           --output_vcf={output.vcf} \
-          --num_shards=10
+          --num_shards=36
         """
 
 rule margin_phase_normal:
@@ -25,12 +29,17 @@ rule margin_phase_normal:
     output:
         phased_vcf="phased/normal_{sample_id}/phased_normal_{sample_id}.vcf",
         phased_bam="phased/normal_{sample_id}/phased_normal_{sample_id}.bam"
-    conda:
-        "envs/margin.yaml"
+    threads: 36
+    resources:
+        mem_mb=config['mem_lg'], 
+        time=config['time'], 
+        partition=config['partition']
+    singularity:
+        "docker://kishwars/pepper_deepvariant:latest"
     shell:
         """
         margin phase {input.normal_bam} {input.ref} {input.vcf} \
-        allParams.np.json -t {threads} \
+        allParams.haplotag.ont-r104q20.json -t {threads} \
         -o {output.phased_vcf} \
         -r {output.phased_bam}
         """
@@ -55,7 +64,7 @@ rule haplotag_normal:
 
 rule haplotag_tumor:
     input:
-        phased_vcf="phased/normal_{sample_id}/phased_normal_{sample_id}.vcf",  # Assuming use of normal sample's VCF for tumor haplotagging
+        phased_vcf="phased/normal_{sample_id}/phased_normal_{sample_id}.vcf",
         tumor_bam="sorted/tumor_{sample_id}/{sample_id}.sorted.bam",
         ref="path/to/ref.fa"
     output:

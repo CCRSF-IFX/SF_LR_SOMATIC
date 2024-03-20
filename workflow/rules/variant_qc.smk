@@ -1,21 +1,30 @@
 # VariantQC 
 
-def get_vtext(wildcards):
+def get_vtext_clairs(samples):
     analysis_folder = os.getcwd()
-    v_text = ""
-    v_text1 = ""
-    for sample in list(set(samples)):
-        v_text += f" -V:{sample} {analysis_folder}/Sample_{sample}/{sample}_dp_filtered.vcf.gz"
-        v_text1 += f" -V:{sample} {analysis_folder}/Sample_{sample}/clair3/{sample}_clair3_filtered.vcf.gz"
-    return [v_text, v_text1]
+    v_text_clairs = ""
+    for sample_id in samples:
+        v_text_clairs += f" -V:{sample_id} {analysis_folder}/clairs/tumor_{sample_id}/{sample_id}_clairs.vcf"
+    return v_text_clairs
 
-rule variantqc:
-	input: dp = expand("Sample_{sample}/{sample}_dp_filtered.vcf.gz", sample=samples), clair3 = expand("Sample_{sample}/clair3/{sample}_clair3_filtered.vcf.gz", sample=samples), ref=config[config['reference']]['ref']
-	output: out1 = "VariantQC_dp.html", out2 = "VariantQC_clair3.html"
-    resources: mem_mb=config['mem_md'], time=config['time'], partition=config['partition']
+rule variantqc_clairs:
+    input:
+        clairs = expand("clairs/tumor_{sample_id}/{sample_id}_clairs.vcf", sample_id=SAMPLES),
+        ref = config['reference']['path']
+    output:
+        out_clairs = "VariantQC/clairs_variantqc.html"
+    resources:
+        mem_mb=config['mem_md'],
+        time=config['time'],
+        partition=config['partition']
     threads: 8
-    log: "Sample_{sample}/{sample}_variantqc.log"
-    singularity: docker://ghcr.io/bimberlab/discvrseq
-	params: vtexts=get_vtext 
-	shell: "VariantQC -R {input.ref} {params.vtexts[0]} -O {output.out1}; VariantQC -R {input.ref} {params.vtexts[1]} -O {output.out2}"
-    
+    log:
+        "logs/variantqc_clairs.log"
+    singularity:
+        "docker://ghcr.io/bimberlab/discvrseq"
+    params:
+        vtexts_clairs = lambda wildcards: get_vtext_clairs(SAMPLES)
+    shell:
+        """
+        VariantQC -R {input.ref} {params.vtexts_clairs} -O {output.out_clairs}
+        """
