@@ -5,18 +5,20 @@ rule run_clairs:
         tumor_bam = "sorted/tumor_{sample_id}/{sample_id}.sorted.bam",
         normal_bam = "sorted/normal_{sample_id}/{sample_id}.sorted.bam"
     output:
-        vcf = "clair3/tumor_{sample_id}/{sample_id}_clair3.vcf"
+        vcf = "clairs/tumor_{sample_id}/{sample_id}_clairs.vcf"
     log:
         "logs/tumor_{sample_id}_clairs.log"
     params:
         ref = config[config['reference']]['ref'],
-        output_dir = lambda wildcards: "clair3/tumor_{sample_id}".format(sample_id=wildcards.sample_id),
+        output_dir = lambda wildcards: "clairs/tumor_{sample_id}".format(sample_id=wildcards.sample_id),
         platform = "ont_r10"
     threads: 36
     resources:
         mem_mb=config['mem_lg'], 
         time=config['time'], 
         partition=config['partition']
+    singularity: 
+        "docker://hkubal/clairs:latest"
     shell:
         """
         mkdir -p {params.output_dir}
