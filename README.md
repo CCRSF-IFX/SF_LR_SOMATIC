@@ -1,104 +1,61 @@
-# Snakemake workflow: longread_somatic
+# Longread Somatic Analysis Pipeline
 
-[![Snakemake](https://img.shields.io/badge/snakemake-≥5.7.0-brightgreen.svg)](https://snakemake.bitbucket.io)
-[![Build Status](https://travis-ci.org/snakemake-workflows/SF_LR_SOMATIC.svg?branch=master)](https://travis-ci.org/snakemake-workflows/SF_LR_SOMATIC)
+This pipeline processes longread sequencing data to identify somatic mutations using various bioinformatics tools. The workflow is defined using Snakemake, ensuring reproducibility and scalability.
 
-This is the template for a new Snakemake workflow. Replace this text with a comprehensive description covering the purpose and domain.
-Insert your code into the respective folders, i.e. `scripts`, `rules`, and `envs`. Define the entry point of the workflow in the `Snakefile` and the main configuration in the `config.yaml` file.
+## Workflow Overview
 
-## Authors
+The pipeline integrates several bioinformatics tools to process samples from raw sequencing data to somatic variant calling and analysis. Key steps include mapping with Minimap2, sorting BAM files, quality control with Qualimap and NanoPlot, variant calling with ClairS, variant annotation with VEP, somatic structure variant (SV) calling, and somatic copy number alteration (CNA) analysis.
 
-* Jack Chen (@jackchenx3)
+![SF_LR_Somatic](/resources/Diagram.PNG)
 
-## Usage
+### Workflow Details
 
-If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this (original) repository and, if available, its DOI (see above).
+The pipeline is designed to take raw sequencing data through a comprehensive analysis to identify and characterize somatic mutations, including single nucleotide variants (SNVs), structural variants (SVs), and copy number alterations (CNAs). Below is a breakdown of the critical stages in the pipeline:
 
-### Step 1: Obtain a copy of this workflow
+#### Mapping with Minimap2
+- **Purpose**: Aligns raw sequencing reads to a reference genome. This step is crucial for identifying the genomic locations of the reads.
+- **Tool**: Minimap2 is a fast sequence alignment program designed to handle long reads (e.g., from PacBio or Oxford Nanopore technologies).
 
-1. Create a new github repository using this workflow [as a template](https://help.github.com/en/articles/creating-a-repository-from-a-template).
-2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the newly created repository to your local system, into the place where you want to perform the data analysis.
+#### Sorting BAM Files
+- **Purpose**: Sorts the aligned reads in the BAM files by their genomic coordinates. Sorting is necessary for many downstream analyses, including variant calling.
+- **Tool**: Typically, this step is performed using tools like Samtools, which can efficiently sort and index BAM files.
 
-### Step 2: Configure workflow
+#### Quality Control with Qualimap and NanoPlot
+- **Purpose**: Assesses the quality of the sequencing and alignment. Quality control metrics help identify potential issues with sequencing runs or alignment processes.
+- **Tools**:
+  - Qualimap provides detailed statistics about alignment quality, coverage, and other essential metrics.
+  - NanoPlot generates graphical summaries of sequencing quality, offering insights into the distribution of read lengths, quality scores, and more.
 
-Configure the workflow according to your needs via editing the files in the `config/` folder. Adjust `config.yaml` to configure the workflow execution, and `samples.tsv` to specify your sample setup.
+#### Variant Calling with ClairS
+- **Purpose**: Identifies somatic variants from the aligned reads, focusing on mutations that occur in cancer cells.
+- **Tool**: ClairS is a variant caller designed for high accuracy in detecting single nucleotide variants (SNVs) and indels from sequencing data.
 
-### Step 3: Install Snakemake
+#### Variant Annotation with VEP
+- **Purpose**: Enriches variant calls with information on their potential effects on genes, proteins, and disease phenotypes. This step is crucial for interpreting the functional impact of identified variants.
+- **Tool**: The Variant Effect Predictor (VEP) annotates detected variants with data from multiple databases, providing insights into their biological significance.
 
-Install Snakemake using [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html):
+#### Somatic Structural Variant (SV) Calling
+- **Purpose**: Detects larger genomic rearrangements such as deletions, duplications, inversions, and translocations that can play significant roles in cancer development.
+- **Tool**: Severus analyze the alignments for patterns indicative of somatic structural variations.
 
-    conda create -c bioconda -c conda-forge -n snakemake snakemake
+#### Somatic Copy Number Alteration (CNA) Analysis
+- **Purpose**: Identifies changes in the number of copies of genomic regions, which are common in cancer genomes and can indicate regions of amplification or deletion associated with oncogenes or tumor suppressor genes.
+- **Tool**: Wakhan can perform somatic CNA analysis, offering insights into the genomic gains and losses across the cancer genome.
 
-For installation details, see the [instructions in the Snakemake documentation](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html).
+### Conclusion
 
-### Step 4: Execute workflow
+By integrating these bioinformatics tools and steps, the pipeline provides a comprehensive analysis of somatic mutations from long read sequencing data, enabling researchers to understand the genetic alterations driving cancer and potentially identify targets for therapy.
 
-Activate the conda environment:
+## Configuration
 
-    conda activate snakemake
+Modify the `config/config.yaml` and `config/sample_sheet.csv` to specify your samples and analysis parameters.
 
-Test your configuration by performing a dry-run via
+## Output
 
-    snakemake --use-conda -n
+The pipeline produces the following key outputs:
 
-Execute the workflow locally via
-
-    snakemake --use-conda --cores $N
-
-using `$N` cores or run it in a cluster environment via
-
-    snakemake --use-conda --cluster qsub --jobs 100
-
-or
-
-    snakemake --use-conda --drmaa --jobs 100
-
-If you not only want to fix the software stack but also the underlying OS, use
-
-    snakemake --use-conda --use-singularity
-
-in combination with any of the modes above.
-See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
-
-### Step 5: Investigate results
-
-After successful execution, you can create a self-contained interactive HTML report with all results via:
-
-    snakemake --report report.html
-
-This report can, e.g., be forwarded to your collaborators.
-An example (using some trivial test data) can be seen [here](https://cdn.rawgit.com/snakemake-workflows/rna-seq-kallisto-sleuth/master/.test/report.html).
-
-### Step 6: Commit changes
-
-Whenever you change something, don't forget to commit the changes back to your github copy of the repository:
-
-    git commit -a
-    git push
-
-### Step 7: Obtain updates from upstream
-
-Whenever you want to synchronize your workflow copy with new developments from upstream, do the following.
-
-1. Once, register the upstream repository in your local copy: `git remote add -f upstream git@github.com:snakemake-workflows/SF_LR_SOMATIC.git` or `git remote add -f upstream https://github.com/snakemake-workflows/SF_LR_SOMATIC.git` if you do not have setup ssh keys.
-2. Update the upstream version: `git fetch upstream`.
-3. Create a diff with the current version: `git diff HEAD upstream/master workflow > upstream-changes.diff`.
-4. Investigate the changes: `vim upstream-changes.diff`.
-5. Apply the modified diff via: `git apply upstream-changes.diff`.
-6. Carefully check whether you need to update the config files: `git diff HEAD upstream/master config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
-
-
-### Step 8: Contribute back
-
-In case you have also changed or added steps, please consider contributing them back to the original repository:
-
-1. [Fork](https://help.github.com/en/articles/fork-a-repo) the original repo to a personal or lab account.
-2. [Clone](https://help.github.com/en/articles/cloning-a-repository) the fork to your local system, to a different place than where you ran your analysis.
-3. Copy the modified files from your analysis to the clone of your fork, e.g., `cp -r workflow path/to/fork`. Make sure to **not** accidentally copy config file contents or sample sheets. Instead, manually update the example config files if necessary.
-4. Commit and push your changes to your fork.
-5. Create a [pull request](https://help.github.com/en/articles/creating-a-pull-request) against the original repository.
-
-## Testing
-
-Test cases are in the subfolder `.test`. They are automatically executed via continuous integration with [Github Actions](https://github.com/features/actions).
-
+- Sorted BAM files
+- Quality control reports from Qualimap and NanoPlot
+- Somatic variants in VCF format annotated with VEP
+- Somatic structure variants results
+- Somatic copy number alteration (CNA) analysis results
