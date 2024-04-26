@@ -59,3 +59,6 @@ The pipeline produces the following key outputs:
 - Somatic variants in VCF format annotated with VEP
 - Somatic structure variants results
 - Somatic copy number alteration (CNA) analysis results
+
+## Contact
+CCRSF_IFX@nih.gov
